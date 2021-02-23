@@ -166,7 +166,7 @@ export default {
       this.isTableLoading = true;
       const { data } = await WheelConfigResource.index(this.query);
       this.data = data;
-      if (data[0] != null || data[0] !== 'undefined') {
+      if (data[0] !== 'undefined' || data[0] !== null || data.length > 0) {
         this.form = Object.assign({}, data[0]);
       } else {
         this.form = Object.assign({}, defaultForm);

@@ -128,7 +128,6 @@ export default {
       this.isTableLoading = true;
       const { data, meta } = await PatternResource.index(this.patternQuery);
       this.patterns = data;
-      console.log(data);
       this.patternTotal = meta.total;
       this.isTableLoading = false;
     },

@@ -49,10 +49,13 @@ class PatternModelLogic extends BaseModelLogic {
 	public function singleRecordUpdate($ids, Request $request): \Illuminate\Http\JsonResponse {
 		$record = WheelPattern::find($ids);
 		if ($record) {
-			if (!$request->has('bonusIncrement') || $request->has('bonusReset')) {
+			if (!$request->has('bonusIncrement') && !$request->has('bonusReset')) {
 				$this->changeLogModel->update($record, $this->initFillFromRequest($request));
 				$record->update($this->initFillFromRequest($request));
-				$record->prizes()->sync(array_filter($request->prizes_location));
+				if ($request->has('prizes_location')) {
+                    $record->prizes()->sync(array_filter($request->prizes_location));
+                }
+
 				return JsonResponse::message(201, $this->message('name', $record));
 			} else {
 				$this->bonusIncrement($record, $request);
@@ -103,7 +106,8 @@ class PatternModelLogic extends BaseModelLogic {
 
 	private function bonusReset(Model $model, Request $request) {
 		if ($request->has('bonusReset')) {
-			$model->bonus_current = $model->bonus_min;
+		    $min = $model->bonus_min;
+			$model->bonus_current = $min;
 			$model->save();
 		}
 	}

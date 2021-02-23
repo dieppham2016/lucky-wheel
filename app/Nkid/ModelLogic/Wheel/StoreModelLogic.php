@@ -4,6 +4,7 @@
 namespace App\Nkid\ModelLogic\Wheel;
 
 
+use App\Http\Resources\Wheel\WheelPatternResource;
 use App\Models\Wheel\WheelPattern;
 use App\Models\Wheel\WheelStore;
 use App\Nkid\ModelLogic\BaseModelLogic;
@@ -52,11 +53,6 @@ class StoreModelLogic extends BaseModelLogic {
 		}
 		$model->update($this->initFillFromRequest($request));
 
-	}
-
-	public function calculateDegrees() {
-		$pattern = WheelPattern::first();
-		dump($pattern);
 	}
 
 }

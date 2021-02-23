@@ -37,6 +37,11 @@ class WheelPrizeServiceProvider extends ServiceProvider {
 			return new App\Nkid\ModelLogic\Wheel\StoreModelLogic;
 		});
 
+		App::bind(
+			'wheel-game-play', function () {
+			return new App\Nkid\ModelLogic\Wheel\GamePlayLogic();
+		});
+
 	}
 
 	/**

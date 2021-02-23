@@ -24,10 +24,12 @@ import BottomBar from '@/views/wheel/components/BottomBar';
 import WinPrizeDialog from '@/views/wheel/components/WinPrizeDialog';
 import DemoDialog from '@/views/wheel/components/DemoDialog';
 
+const Gpio = require('pigpio').Gpio;
+const pin_coin = new Gpio(17, { mode: Gpio.INPUT });
+
 const PatternResource = new Resource('wheel/patterns');
 const ConfigResource = new Resource('wheel/config');
 const StoreResource = new Resource('wheel/store');
-const DegreesResource = new Resource('wheel/degrees');
 
 export default {
   name: 'LuckyWheel',
@@ -73,9 +75,6 @@ export default {
     });
   },
   methods: {
-    getDegrees() {
-      DegreesResource.index();
-    },
     async getPatternData() {
       this.wheelLoading = true;
       const { data } = await PatternResource.index();
@@ -100,8 +99,6 @@ export default {
       PatternResource.index({ only: ['bonus_current', 'bonus_enable'] }).then((response) => {
         if (response.data[0].bonus_enable) {
           this.bonus = response.data[0].bonus_current;
-          console.log('response', response.data[0]);
-          console.log('bonus', this.bonus);
         }
         if (callback) {
           callback();
@@ -132,7 +129,6 @@ export default {
             fillStyle: '#25b66f',
             textFillStyle: '#efefef',
             prize: 'Bonus',
-            size: 19,
             amount: this.patternData[0].bonus_current,
           };
         } else {

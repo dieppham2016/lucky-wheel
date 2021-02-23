@@ -40,7 +40,7 @@ Route::group(['middleware' => 'api'], function () {
             'config' => Wheel\WheelConfigController::class,
             'store' => Wheel\WheelStoreController::class,
         ]);
-		Route::get('degrees', [\App\Http\Controllers\Wheel\DegreesController::class, 'degrees'])->name('degrees');
+		Route::get('game', [\App\Http\Controllers\Wheel\GameController::class, 'degrees'])->name('degrees');
         Route::delete('prizes', [\App\Http\Controllers\Wheel\WheelPrizeController::class, 'destroys']);
     });
 

@@ -23,6 +23,9 @@
 <script>
 
 import * as Winwheel from 'vue-winwheel/Winwheel';
+import GameResource from '@/api/game-resource';
+
+const GamePlayResource = new GameResource('wheel/game');
 
 export default {
   name: 'Wheel',
@@ -103,13 +106,13 @@ export default {
         textFontSize: this.wheelHeight / 14, // Font size.
         segments: this.segments,
         animation: // Definition of the animation
-            {
-              type: 'spinToStop',
-              duration: 10,
-              spins: 8,
-              callbackAfter: this.drawTriangle,
-              callbackFinished: this.handleSpinStop,
-            },
+          {
+            type: 'spinToStop',
+            duration: 10,
+            spins: 8,
+            callbackAfter: this.drawTriangle,
+            callbackFinished: this.handleSpinStop,
+          },
       });
       this.getScaleFactor();
       this.wheel.rotationAngle = 0; // Re-set the wheel angle to 0 degrees.
@@ -141,16 +144,19 @@ export default {
       this.$emit('spinStop', indicatedSegment, this.wheel.getIndicatedSegmentNumber());
       this.wheel.rotationAngle %= 360;
     },
+    async getDegrees(callback) {
+      GamePlayResource.degrees().then((response) => {
+        if (callback) {
+          callback(response);
+        }
+      });
+    },
     handleStart() {
       this.playSound();
-      // This formula always makes the wheel stop somewhere inside prize 3 at least
-      // 1 degree away from the start and end edges of the segment.
-      const stopAt = (91 + Math.floor((Math.random() * 43)));
-
-      // Important thing is to set the stopAngle of the animation before stating the spin.
-      this.wheel.animation.stopAngle = stopAt;
-
-      this.wheel.startAnimation();
+      this.getDegrees((response) => {
+        this.wheel.animation.stopAngle = parseInt(response.data);
+        this.wheel.startAnimation();
+      });
     },
     playSound() {
       this.audioSpin.pause();
