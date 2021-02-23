@@ -10,7 +10,8 @@ use WheelStoreLogic;
 class DegreesController extends Controller
 {
 
-	public function degrees(): AnonymousResourceCollection {
-		return WheelStoreLogic::degrees();
-	}
+    public function degrees(): AnonymousResourceCollection
+    {
+        return WheelStoreLogic::degrees();
+    }
 }
