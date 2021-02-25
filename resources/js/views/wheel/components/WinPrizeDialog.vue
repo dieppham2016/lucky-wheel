@@ -1,5 +1,6 @@
 <template>
-  <el-dialog v-if="isShowWinningDialog" custom-class="prize-dialog-wrapper" :show-close="false" center visible>
+  <!--  <el-dialog v-if="isShowWinningDialog" custom-class="prize-dialog-wrapper" :show-close="false" center visible>-->
+  <el-dialog custom-class="prize-dialog-wrapper" :show-close="false" center :visible="isShowWinningDialog" @closed="handleClose">
     <el-row class="prize-dialog" type="flex" justify="center" align="middle">
       <div class="prize-dialog-content">Chúc mừng bé nhận được: <span class="prize-dialog-item">{{ prizeWinning }}</span></div>
     </el-row>
@@ -22,6 +23,11 @@ export default {
   data() {
     return {
     };
+  },
+  methods: {
+    handleClose() {
+      this.$emit('onClosed');
+    },
   },
 };
 </script>

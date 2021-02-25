@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-dialog v-if="isShowDemoDialog" custom-class="demo-dialog--wrapper" fullscreen visible :show-close="false" center>
+    <!--    <el-dialog v-if="isShowDemoDialog" custom-class="demo-dialog&#45;&#45;wrapper" fullscreen visible :show-close="false" center @closed="handleClose">-->
+    <el-dialog custom-class="demo-dialog--wrapper" fullscreen :visible="isShowDemoDialog" :show-close="false" center @closed="handleClose">
       <div class="demo-dialog--bottom">
         <el-row type="flex" justify="center" align="middle">
           <span class="demo--suggest">Swipe cards to play game</span>
@@ -37,6 +38,9 @@ export default {
   methods: {
     handleAddCoin() {
       this.$emit('addCoin');
+    },
+    handleClose() {
+      this.$emit('onClose');
     },
   },
 };

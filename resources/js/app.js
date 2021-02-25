@@ -7,21 +7,33 @@ import router from '@/router';
 import i18n from './lang'; // Internationalization
 import '@/icons'; // icon
 import '@/permission'; // permission control
-import Echo from 'laravel-echo';
+// import Echo from 'laravel-echo';
 // import Pusher from 'pusher-js';
 
 import * as filters from './filters'; // global filters
 
 window._ = require('lodash');
-window.io = require('socket.io-client');
+// window.io = require('socket.io-client');
+
+import VueSocketIO from 'vue-socket.io';
+
+Vue.use(new VueSocketIO({
+  debug: process.env.APP_DEBUG,
+  connection: window.location.hostname + ':2909',
+}));
+
 // window.Pusher = require('pusher-js');
 
-if (typeof io !== 'undefined') {
-  window.Echo = new Echo({
-    broadcaster: 'socket.io',
-    host: window.location.hostname + ':2908',
-  });
-}
+// import { HardwareIO } from './hardwareIo';
+
+// window.hardwareIO = new HardwareIO();
+
+// if (typeof io !== 'undefined') {
+//   window.Echo = new Echo({
+//     broadcaster: 'socket.io',
+//     host: window.location.hostname + ':2908',
+//   });
+// }
 // window.Echo = new Echo({
 //   broadcaster: 'pusher',
 //   key: 'e92cfe11569986fdf257',
@@ -49,3 +61,4 @@ new Vue({
   i18n,
   render: h => h(App),
 });
+

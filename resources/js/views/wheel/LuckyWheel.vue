@@ -10,9 +10,9 @@
 
     <bottom-bar :credit="storeGame.coin" @handleStart="startPin" />
 
-    <win-prize-dialog :is-show-winning-dialog="isShowWinningDialog" :prize-winning="prizeWinning" />
+    <win-prize-dialog :is-show-winning-dialog="isShowWinningDialog" :prize-winning="prizeWinning" @onClosed="handleCloseWinDialog" />
 
-    <demo-dialog :is-show-demo-dialog="isShowDemoDialog" :credit="storeGame.coin" @addCoin="handleAddCoin" />
+    <demo-dialog :is-show-demo-dialog="isShowDemoDialog" :credit="storeGame.coin" @addCoin="handleAddCoin" @onClosed="handleCloseDemoDialog" />
   </el-col>
 </template>
 
@@ -23,9 +23,6 @@ import TopBar from '@/views/wheel/components/TopBar';
 import BottomBar from '@/views/wheel/components/BottomBar';
 import WinPrizeDialog from '@/views/wheel/components/WinPrizeDialog';
 import DemoDialog from '@/views/wheel/components/DemoDialog';
-
-const Gpio = require('pigpio').Gpio;
-const pin_coin = new Gpio(17, { mode: Gpio.INPUT });
 
 const PatternResource = new Resource('wheel/patterns');
 const ConfigResource = new Resource('wheel/config');
@@ -45,6 +42,8 @@ export default {
       config: [],
       storeGame: [],
       segments: [],
+      ticketReturn: 0,
+      timeReturnTicket: null,
       bonusEnable: false,
       wheelLoading: false,
       isWheelReady: false,
@@ -55,6 +54,44 @@ export default {
       windowWidth: window.innerWidth,
     };
   },
+  sockets: {
+    connect() {
+      // Fired when the socket connects.
+      console.log('connect Socket');
+    },
+
+    disconnect() {
+      console.log('disconnect Socket');
+    },
+    // Fired when the server sends something on the "messageChannel" channel.
+    messageChannel(data) {
+      console.log(data);
+    },
+    buttonStartPressed(level) {
+      if (this.config && level === this.config.io_ticket_input) {
+        this.startPin();
+      }
+    },
+    coinInput(level) {
+      if (this.config && level === this.config.io_ticket_input) {
+        this.handleAddCoin();
+      }
+    },
+    ticketInput(level) {
+      if (this.config && level === this.config.io_ticket_input) {
+        this.ticketReturn++;
+        this.timeReturnTicket = setTimeout(() => {
+          this.$socket.emit('activeTicket', !this.config.io_ticket_output);
+          console.log('Error Ticket');
+        }, 3000);
+      }
+    },
+    clearTicket(level) {
+      if (this.config && level === this.config.io_ticket_input) {
+        //
+      }
+    },
+  },
   computed: {
     _windowWidth() {
       return this.windowWidth + 'px';
@@ -63,7 +100,11 @@ export default {
       return this.windowHeight + 'px';
     },
   },
-  watch: {},
+  watch: {
+    ticketReturn(newValue, oldValue) {
+      clearInterval(this.timeReturnTicket);
+    },
+  },
   created() {
     this.getPatternData();
     this.getConfig();
@@ -203,7 +244,6 @@ export default {
               setTimeout(() => {
                 this.isShowDemoDialog = false;
               }, 200);
-              this.countDown();
             });
           });
         } else {
@@ -212,7 +252,6 @@ export default {
             setTimeout(() => {
               this.isShowDemoDialog = false;
             }, 200);
-            this.countDown();
           });
         }
       });
@@ -241,6 +280,12 @@ export default {
           clearInterval(this.clock);
         }
       }, 1000);
+    },
+    handleCloseDemoDialog() {
+      this.countDown();
+    },
+    handleCloseWinDialog() {
+      this.$socket.emit('activeTicket', this.config.io_ticket_output);
     },
   },
 };
