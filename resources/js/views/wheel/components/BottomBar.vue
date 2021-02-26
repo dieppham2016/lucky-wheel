@@ -1,6 +1,13 @@
 <template>
   <div class="wheel-bottom">
     <el-row type="flex" align="bottom">
+      <el-col :span="8" :style="{visibility: ticket > 0 ? 'visible' : 'hidden'}">
+        <el-row type="flex" align="bottom" justify="left">
+          <span class="wheel-credit">Ticket: </span>
+          <span class="wheel-credit">{{ ticket }}</span>
+        </el-row>
+        <span :style="{visibility: error ? 'visible' : 'hidden'}" class="wheel-credit">ERROR: {{ error }}</span>
+      </el-col>
       <el-col :span="8">
         <el-row type="flex" justify="center" align="middle">
           <span class="wheel-credit">Credits: {{ credit }}/1</span>
@@ -21,6 +28,14 @@ export default {
     credit: {
       type: Number,
       default: 0,
+    },
+    ticket: {
+      type: Number,
+      default: 0,
+    },
+    error: {
+      type: String,
+      default: '',
     },
   },
   methods: {

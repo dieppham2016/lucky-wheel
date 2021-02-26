@@ -3,14 +3,26 @@
     <!--    <el-dialog v-if="isShowDemoDialog" custom-class="demo-dialog&#45;&#45;wrapper" fullscreen visible :show-close="false" center @closed="handleClose">-->
     <el-dialog custom-class="demo-dialog--wrapper" fullscreen :visible="isShowDemoDialog" :show-close="false" center @closed="handleClose">
       <div class="demo-dialog--bottom">
-        <el-row type="flex" justify="center" align="middle">
-          <span class="demo--suggest">Swipe cards to play game</span>
-        </el-row>
-        <el-row type="flex" justify="center" align="middle">
-          <el-button class="demo--button" type="success" @click="handleAddCoin">Test Game</el-button>
-        </el-row>
-        <el-row type="flex" justify="center" align="middle">
-          <span class="demo--credit">Credits: {{ credit }}/1</span>
+        <el-row type="flex" justify="center" align="bottom">
+          <el-col :span="8" :style="{visibility: ticket > 0 ? 'visible' : 'hidden'}">
+            <el-row type="flex" align="bottom" justify="left">
+              <span class="demo--credit">Ticket: </span>
+              <span class="demo--credit">{{ ticket }}</span>
+            </el-row>
+            <span :style="{visibility: error ? 'visible' : 'hidden'}" class="demo--credit">ERROR: {{ error }}</span>
+          </el-col>
+          <el-col :span="8">
+            <el-row type="flex" justify="center" align="middle">
+              <span class="demo--suggest">Swipe cards to play game</span>
+            </el-row>
+            <el-row type="flex" justify="center" align="middle">
+              <el-button class="demo--button" type="success" @click="handleAddCoin">Test Game</el-button>
+            </el-row>
+            <el-row type="flex" justify="center" align="middle">
+              <span class="demo--credit">Credits: {{ credit }}/1</span>
+            </el-row>
+          </el-col>
+          <el-col :span="8" />
         </el-row>
       </div>
     </el-dialog>
@@ -28,6 +40,14 @@ export default {
     credit: {
       type: Number,
       default: 0,
+    },
+    ticket: {
+      type: Number,
+      default: 0,
+    },
+    error: {
+      type: String,
+      default: '',
     },
   },
   data() {

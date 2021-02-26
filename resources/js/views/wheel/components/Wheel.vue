@@ -108,7 +108,7 @@ export default {
         animation: // Definition of the animation
           {
             type: 'spinToStop',
-            duration: 10,
+            duration: 3,
             spins: 8,
             callbackAfter: this.drawTriangle,
             callbackFinished: this.handleSpinStop,

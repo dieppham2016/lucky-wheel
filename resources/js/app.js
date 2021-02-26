@@ -18,8 +18,9 @@ window._ = require('lodash');
 import VueSocketIO from 'vue-socket.io';
 
 Vue.use(new VueSocketIO({
-  debug: process.env.APP_DEBUG,
-  connection: window.location.hostname + ':2909',
+  // debug: process.env.APP_DEBUG,
+  debug: true,
+  connection: window.location.hostname + ':2910',
 }));
 
 // window.Pusher = require('pusher-js');
