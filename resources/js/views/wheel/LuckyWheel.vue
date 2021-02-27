@@ -36,19 +36,19 @@ export default {
       timePlay: 0,
       coin: 0,
       bonus: 0,
-      clock: null,
+      timeAutoplay: null,
       patternData: [],
       degrees: null,
       config: [],
       storeGame: [],
       segments: [],
       ticketReturn: 0,
-      ticketRemaining: [],
       error: '',
       timeReturnTicket: null,
       bonusEnable: false,
       wheelLoading: false,
-      isWheelReady: false,
+      isWheelReady: true,
+      isWheelRunning: false,
       isShowWinningDialog: false,
       isShowDemoDialog: true,
       prizeWinning: null,
@@ -61,7 +61,6 @@ export default {
       // Fired when the socket connects.
       console.log('connect Socket');
       this.$socket.emit('activeTicket', Number(!this.config.io_ticket_output));
-      console.log('!this.config.io_ticket_output', Number(!this.config.io_ticket_output));
     },
 
     disconnect() {
@@ -73,15 +72,12 @@ export default {
     },
     buttonStartPressed(level) {
       if (this.config && level === this.config.io_ticket_input) {
-        if (this.isShowDemoDialog && this.storeGame.coin > 0 && !this.isWheelReady) {
-          console.log(('Hide Demo'));
-          this.isWheelReady = true;
+        if (this.isShowDemoDialog && this.storeGame.coin > 0) {
           setTimeout(() => {
             this.isShowDemoDialog = false;
             this.countDown();
           }, 200);
         } else {
-          console.log(('Start', this.isWheelReady));
           this.startPin();
         }
       }
@@ -93,9 +89,12 @@ export default {
     },
     ticketInput(level) {
       if (this.config && level === this.config.io_ticket_input) {
+        this.storeGame.ticketRemaining = this.ticketReturn;
         if (this.ticketReturn > 0) {
           this.ticketReturn--;
-          console.log(this.ticketReturn);
+          if (this.error) {
+            this.error = '';
+          }
         } else {
           this.disableSendTicket();
         }
@@ -108,6 +107,11 @@ export default {
         }
         this.checkTicketRemaining();
         this.error = '';
+        setTimeout(() => {
+          StoreResource.update(1, {
+            current_error: this.error,
+          }, 1000);
+        });
       }
     },
   },
@@ -125,15 +129,30 @@ export default {
         if (this.timeReturnTicket) {
           clearInterval(this.timeReturnTicket);
         }
-        this.timeReturnTicket = setTimeout(() => {
-          this.$socket.emit('activeTicket', Number(!this.config.io_ticket_output));
-          console.log('Error Ticket');
-          this.error = 'Liên hệ nhân viên';
-        }, 500);
-        if (newValue <= 0) {
-          setTimeout(() => {
-            this.checkTicketRemaining();
+        if (newValue > 0) {
+          this.timeReturnTicket = setTimeout(() => {
+            this.$socket.emit('activeTicket', Number(!this.config.io_ticket_output));
+            console.log('Error Ticket');
+            this.error = 'Liên hệ nhân viên';
+            StoreResource.update(1, {
+              ticket_remaining_by_session: this.storeGame.ticket_remaining_by_session,
+              current_error: this.error,
+              ticket_remaining: this.ticketReturn,
+            });
           }, 1000);
+        } else if (newValue <= 0) {
+          if (this.timeReturnTicket) {
+            clearInterval(this.timeReturnTicket);
+            StoreResource.update(1, {
+              ticket_remaining_by_session: this.storeGame.ticket_remaining_by_session,
+              current_error: this.error,
+              ticket_remaining: this.ticketReturn,
+            }).then(() => {
+              setTimeout(() => {
+                this.checkTicketRemaining();
+              }, 1000);
+            });
+          }
         }
       }
     },
@@ -170,6 +189,10 @@ export default {
     async getStoreGame() {
       const { data } = await StoreResource.index();
       this.storeGame = data[0];
+      if (!this.ticketReturn) {
+        this.checkTicketRemaining();
+      }
+      this.error = this.storeGame.current_error;
     },
     getBonusData(callback) {
       PatternResource.index({ only: ['bonus_current', 'bonus_enable'] }).then((response) => {
@@ -226,25 +249,26 @@ export default {
       this.isShowWinningDialog = true;
       this.prizeWinning = segment.prize.toString();
       if (['Ticket', 'Bonus'].includes(segment.type.toString())) {
-        this.ticketRemaining.push(segment.amount);
+        if (this.storeGame.ticket_remaining_by_session === null) {
+          this.storeGame.ticket_remaining_by_session = [];
+        }
+        this.storeGame.ticket_remaining_by_session.push(segment.amount);
       }
       this.checkTicketRemaining();
       this.bonusReset(segment);
       this.hideWinningDialog(segment);
       if (this.storeGame.coin < 1) {
         this.showDemoDialog();
-      } else {
-        setTimeout(() => {
-          if (this.isWheelReady) {
-            this.countDown();
-          }
-        }, 3000);
       }
     },
     handleCloseDemoDialog() {
       this.countDown();
     },
     handleCloseWinDialog() {
+      this.isWheelReady = true;
+      if (this.storeGame.coin > 0) {
+        this.countDown();
+      }
       this.enableSendTicket();
     },
     handleAddCoin() {
@@ -252,7 +276,6 @@ export default {
         if (this.patternData[0].bonus_auto_increment) {
           this.bonusIncrement(() => {
             this.getStoreGame().then(() => {
-              this.isWheelReady = true;
               setTimeout(() => {
                 this.isShowDemoDialog = false;
               }, 200);
@@ -260,7 +283,6 @@ export default {
           });
         } else {
           this.getStoreGame().then(() => {
-            this.isWheelReady = true;
             setTimeout(() => {
               this.isShowDemoDialog = false;
             }, 200);
@@ -274,7 +296,7 @@ export default {
     },
     startPin() {
       if (this.storeGame.coin > 0 && this.isWheelReady) {
-        clearInterval(this.clock);
+        clearInterval(this.timeAutoplay);
         this.timePlay = 0;
         this.isWheelReady = false;
         StoreResource.update(1, { coin: -1 }).then(() => {
@@ -306,7 +328,6 @@ export default {
       const time = segment.name !== 'Bonus' ? this.config.time_show_congratulation_short : this.config.time_show_congratulation_long;
       setTimeout(() => {
         this.isShowWinningDialog = false;
-        this.isWheelReady = true;
       }, time);
     },
     showDemoDialog() {
@@ -319,20 +340,22 @@ export default {
     },
     countDown() {
       this.timePlay = this.mills2second(this.config.time_auto_play);
-      this.clock = setInterval(() => {
+      if (this.timeAutoplay) {
+        clearInterval(this.timeAutoplay);
+      }
+      this.timeAutoplay = setInterval(() => {
         this.timePlay -= 1;
         if (this.timePlay <= 0) {
-          this.isWheelReady = true;
           this.startPin();
-          clearInterval(this.clock);
+          clearInterval(this.timeAutoplay);
         }
       }, 1000);
     },
     checkTicketRemaining() {
-      if (this.ticketRemaining.length > 0 && (this.ticketReturn <= 0 || !this.ticketReturn)) {
-        this.ticketReturn = this.ticketRemaining[this.ticketRemaining.length - 1];
-        delete this.ticketRemaining[this.ticketRemaining.length - 1];
-        this.ticketRemaining = this.ticketRemaining.filter(e => e != null);
+      if (this.storeGame.ticket_remaining_by_session.length > 0 && (this.ticketReturn <= 0 || !this.ticketReturn)) {
+        this.ticketReturn = this.storeGame.ticket_remaining_by_session[this.storeGame.ticket_remaining_by_session.length - 1];
+        delete this.storeGame.ticket_remaining_by_session[this.storeGame.ticket_remaining_by_session.length - 1];
+        this.storeGame.ticket_remaining_by_session = this.storeGame.ticket_remaining_by_session.filter(e => e != null);
       }
       this.enableSendTicket();
     },

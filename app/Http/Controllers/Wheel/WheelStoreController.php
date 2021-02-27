@@ -12,58 +12,14 @@ use WheelStoreLogic;
 
 class WheelStoreController extends Controller
 {
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @param Request $request
-	 * @return Response
-	 */
-    public function index(Request $request): AnonymousResourceCollection {
-        return WheelStoreLogic::index($request);
-    }
-
-
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Display a listing of the resource.
      *
      * @param Request $request
-     * @return Response
+     * @return AnonymousResourceCollection
      */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param WheelStore $wheelStore
-     * @return Response
-     */
-    public function show(WheelStore $wheelStore)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param WheelStore $wheelStore
-     * @return Response
-     */
-    public function edit(WheelStore $wheelStore)
-    {
-        //
+    public function index(Request $request): AnonymousResourceCollection {
+        return WheelStoreLogic::index($request);
     }
 
 	/**
@@ -75,16 +31,5 @@ class WheelStoreController extends Controller
 	 */
     public function update($id, Request $request): JsonResponse {
         return WheelStoreLogic::singleRecordUpdate($id, $request);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param WheelStore $wheelStore
-     * @return Response
-     */
-    public function destroy(WheelStore $wheelStore)
-    {
-        //
     }
 }

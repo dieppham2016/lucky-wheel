@@ -24,5 +24,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WheelLog extends Model
 {
-    //
+    protected $table = 'wheel_logs';
+
+    protected $fillable = ['description', 'status'];
+
+    protected $guarded = ['id'];
+
 }

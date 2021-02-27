@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use GamePlayLogic;
+use GameLogLogic;
 
 class GameController extends Controller
 {
@@ -21,5 +22,13 @@ class GameController extends Controller
     public function degrees(Request $request): JsonResponse
     {
         return GamePlayLogic::calculateDegrees($request);
+    }
+
+    public function log(Request $request) {
+        return GameLogLogic::create($request);
+    }
+
+    public function updateLog($id, Request $request) {
+        return GameLogLogic::singleRecordUpdate($id, $request);
     }
 }

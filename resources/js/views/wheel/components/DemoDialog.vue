@@ -6,7 +6,7 @@
         <el-row type="flex" justify="center" align="bottom">
           <el-col :span="8" :style="{visibility: ticket > 0 ? 'visible' : 'hidden'}">
             <el-row type="flex" align="bottom" justify="left">
-              <span class="demo--credit">Ticket: </span>
+              <span class="demo--credit">Tickets: </span>
               <span class="demo--credit">{{ ticket }}</span>
             </el-row>
             <span :style="{visibility: error ? 'visible' : 'hidden'}" class="demo--credit">ERROR: {{ error }}</span>
@@ -16,7 +16,7 @@
               <span class="demo--suggest">Swipe cards to play game</span>
             </el-row>
             <el-row type="flex" justify="center" align="middle">
-              <el-button class="demo--button" type="success" @click="handleAddCoin">Test Game</el-button>
+              <!--              <el-button class="demo&#45;&#45;button" type="success" @click="handleAddCoin">Test Game</el-button>-->
             </el-row>
             <el-row type="flex" justify="center" align="middle">
               <span class="demo--credit">Credits: {{ credit }}/1</span>

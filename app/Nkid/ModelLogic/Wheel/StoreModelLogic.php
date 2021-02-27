@@ -4,8 +4,6 @@
 namespace App\Nkid\ModelLogic\Wheel;
 
 
-use App\Http\Resources\Wheel\WheelPatternResource;
-use App\Models\Wheel\WheelPattern;
 use App\Models\Wheel\WheelStore;
 use App\Nkid\ModelLogic\BaseModelLogic;
 use Illuminate\Database\Eloquent\Model;

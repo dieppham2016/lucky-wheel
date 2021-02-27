@@ -238,6 +238,7 @@ return [
 		'WheelConfigLogic' => App\Nkid\Facades\Wheel\ConfigFacade::class,
 		'WheelStoreLogic' => App\Nkid\Facades\Wheel\StoreFacade::class,
         'GamePlayLogic' => \App\Nkid\Facades\Wheel\GamePlayFacade::class,
+        'GameLogLogic' => \App\Nkid\Facades\Wheel\GameLogFacade::class,
 
 	],
 
